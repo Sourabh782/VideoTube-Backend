@@ -1,0 +1,11 @@
+{
+  "name": "backend-project",
+  "version": "1.0.0",
+  "description": "a backend at chai aur code channel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sourabh Rawat",
+  "license": "ISC"
+}
