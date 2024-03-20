@@ -20,7 +20,7 @@ app.use(express.urlencoded({ // for different types of url data eg: some browser
 
 app.use(express.static('public')) // for storing temp data
 
-app.use(cookieParser())
+app.use(cookieParser())  // for allowing cookies availablity
 
 
 // routes
