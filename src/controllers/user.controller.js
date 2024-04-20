@@ -168,8 +168,8 @@ const logoutUser = asyncHandler( async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: 1 // removes data from database
             }
         },
         {
@@ -295,7 +295,7 @@ const updateUserAvatar = asyncHandler( async (req, res) => {
 
     const toDelete = userDetails.avatarid;
 
-    const avatarLocalPath = req.files?.avatar[0].path;
+    const avatarLocalPath = req.file?.path;
 
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar file not found");
@@ -324,7 +324,13 @@ const updateUserAvatar = asyncHandler( async (req, res) => {
 })
 
 const updateUserCoverImage = asyncHandler( async (req, res) => {
-    const coverImagePath = req.files?.coverimage[0]?.path;
+    const userDetails = await User.findById(req.user._id);
+
+    if(!userDetails){
+        throw new ApiError(401, "User not logged in")
+    }
+
+    const coverImagePath = req.file?.path;
 
     if(!coverImagePath){
         throw new ApiError(400, "Cover image not found");

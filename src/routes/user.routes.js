@@ -56,7 +56,7 @@ router.route("/currentUser").get(
     getCurrentUser
 )
 
-router.route("updateAccount").patch(
+router.route("/updateAccount").patch(
     verifyJWT,
     updateUserDetails
 )
