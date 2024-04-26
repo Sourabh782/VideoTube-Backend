@@ -25,9 +25,12 @@ app.use(cookieParser())  // for allowing cookies availablity
 
 // routes
 import userRouter from "./routes/user.routes.js"
+import tweetRouter from "./routes/tweet.routes.js"
 
 // routes declaration
 app.use("/api/v1/users", userRouter); // we have to use middleware  // sends control to user route
+app.use("/api/v1/tweets", tweetRouter);
+
 
 // url = http://localhost:8000/api/v1/users/register
 

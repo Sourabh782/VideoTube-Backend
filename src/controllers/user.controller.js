@@ -353,7 +353,9 @@ const updateUserCoverImage = asyncHandler( async (req, res) => {
                 coverid: coverImage.public_id
             }
         },
-        { new: true }
+        { 
+            new: true 
+        }
     ).select("-password -refreshToken")
 
     deleteFromCloudinary(toDelete.coverid);
