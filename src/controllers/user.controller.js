@@ -438,17 +438,18 @@ const getUserChannelProfile = asyncHandler( async (req, res) => {
 })
 
 const getWatchHistory = asyncHandler( async (req, res) => {
-    // when we use req.user._id we get string not mongoDb id, it is done by mongoose to gonvert out input to proper format
+    // when we use req.user._id we get string not mongoDb id, it is done by mongoose to convert out input to proper format
     const user = await User.aggregate([
         {
             $match: {
                 // _id: req.user._id  -> error
                 _id: new mongoose.Types.ObjectId(req.user._id)
             }
-        }, {
+        }, 
+        {
             $lookup: {
                 from: "videos",
-                localField: "whatchHistory",
+                localField: "watchhistory",
                 foreignField: "_id",
                 as: "watchHistory",
 
