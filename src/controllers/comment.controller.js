@@ -4,6 +4,7 @@ import { Video } from "../models/video.model.js"
 import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
+import { Like } from "../models/like.model.js";
 
 const createComment = asyncHandler(async (req, res)=>{
     const { videoId } = req.params;
@@ -26,7 +27,7 @@ const createComment = asyncHandler(async (req, res)=>{
 
     const comment = await Comment.create({
         content,
-        video: videoId,
+        video: new mongoose.Types.ObjectId(videoId, {id:1}),
         owner: req.user?._id
     })
 
@@ -71,6 +72,21 @@ const getVideoComments = asyncHandler(async(req, res)=>{
             }
         },
         {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "comment",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                "likesCount": {
+                    $size: "$likes"
+                }
+            }
+        },
+        {
             $addFields: {
                 owner: {
                     $first: "$owner"
@@ -108,7 +124,9 @@ const updateComment = asyncHandler(async(req, res)=>{
     }
 
     const updatedComment = await Comment.findByIdAndUpdate(commentId, {
-        content
+        $set: {
+            content
+        }
     }, {new: true})
 
     if(!updatedComment){
@@ -141,6 +159,12 @@ const deleteComment = asyncHandler(async(req, res)=>{
 
     if(!deleted){
         throw new ApiError(500, "Something went wrong while deleting. please try again later");
+    }
+
+    const likeDeleted = await Like.deleteMany({comment: new mongoose.Types.ObjectId(commentId)})
+
+    if(!likeDeleted){
+        throw new ApiError(500, "something went wrong while deleting like");
     }
 
     return res.status(200).json(
