@@ -7,6 +7,7 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 import mongoose, { isValidObjectId } from "mongoose";
 import { Like } from "../models/like.model.js";
 import { Comment } from "../models/comment.model.js";
+import { PlayList } from "../models/playlist.model.js";
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
@@ -246,9 +247,10 @@ const deleteVideo = asyncHandler(async (req, res) => {
     }
 
     await User.updateMany({ watchhistory: videoId }, { $pull: { watchhistory: videoId } })
+    await PlayList.updateMany({ videos: videoId }, { $pull: {videos: videoId}})
 
-    const likeDeleted = await Like.deleteMany({video: mongoose.Types.ObjectId(videoId)})
-    const commentDeleted = await Comment.deleteMany({video: mongoose.Types.ObjectId(videoId)})
+    const likeDeleted = await Like.deleteMany({video: new mongoose.Types.ObjectId(videoId)})
+    const commentDeleted = await Comment.deleteMany({video: new mongoose.Types.ObjectId(videoId)})
 
     if(!likeDeleted || !commentDeleted){
         throw new ApiError(500, "like or comment not deleted")
