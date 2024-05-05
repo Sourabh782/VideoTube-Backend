@@ -1,0 +1,15 @@
+PORT = 8000
+
+MONGODB_URI = "mongodb connection string"
+
+ACCESS_TOKEN_SECRET = "access token secret"
+ACCESS_TOKEN_EXPIRY = 1d
+
+REFRESH_TOKEN_SECRET = "refresh token secret"
+REFRESH_TOKEN_EXPIRY = 10d
+
+CLOUDINARY_CLOUD_NAME = "cloudinary db name"
+CLOUDINARY_API_KEY = "apikey"
+CLOUDINARY_API_SECRET = "api secret key"
+
+CORS_ORIGIN = *       #       * for all
