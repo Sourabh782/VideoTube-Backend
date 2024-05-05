@@ -5,6 +5,8 @@ import { Video } from "../models/video.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 import mongoose, { isValidObjectId } from "mongoose";
+import { Like } from "../models/like.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
@@ -89,8 +91,68 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(404, "No video found");
     }
 
+    const videoDetails = await Video.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(videoId, {id: 1})
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "video",
+                as: "likes"
+            }
+        },
+        {
+            $addFields: {
+                likes: {
+                    $size: "$likes"
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+
+                pipeline: [
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            username: 1,
+                            avatar: 1,
+                            fullname: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                videoFile: 1,
+                thumbnail: 1,
+                title: 1,
+                description: 1,
+                duration: 1,
+                views: 1,
+                owner: 1,
+                likes: 1
+            }
+        }
+    ])
+
     return res.status(200).json(
-        new ApiResponse(200, video, "Video fetched")
+        new ApiResponse(200, videoDetails, "Video fetched")
     )
 })
 
@@ -183,7 +245,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
         throw new ApiError(500, "cannot delete thumbnail try again");
     }
 
-    await  User.updateMany({ watchhistory: videoId }, { $pull: { watchhistory: videoId } })
+    await User.updateMany({ watchhistory: videoId }, { $pull: { watchhistory: videoId } })
+
+    const likeDeleted = await Like.deleteMany({video: mongoose.Types.ObjectId(videoId)})
+    const commentDeleted = await Comment.deleteMany({video: mongoose.Types.ObjectId(videoId)})
+
+    if(!likeDeleted || !commentDeleted){
+        throw new ApiError(500, "like or comment not deleted")
+    }
 
     const deleted = await Video.findByIdAndDelete(videoId);
 
