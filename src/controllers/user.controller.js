@@ -62,15 +62,14 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(409, "username and email must be unique");
     }
 
-    // console.log(req.files);
-    // console.log(req.body);
+    console.log(req.files);
+    console.log(req.body);
 
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
     const coverImageLocalPath = req.files?.coverimage?.[0]?.path;
 
-    // console.log(avatarLocalPath);
-    // console.log(coverImageLocalPath); 
-
+    console.log(avatarLocalPath);
+    console.log(coverImageLocalPath); 
 
     if(!avatarLocalPath){
         throw new ApiError(400, "avatar is required");

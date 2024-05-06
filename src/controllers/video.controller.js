@@ -23,9 +23,14 @@ const publishAVideo = asyncHandler(async (req, res) => {
     if(!description || description.trim() === ""){
         throw new ApiError(400, "Invalid description")
     }
+
+    console.log(req.files)
     
     const videoLocalPath = req.files?.videoFile?.[0]?.path;
     const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
+
+    console.log(videoLocalPath)
+    console.log(thumbnailLocalPath)
 
     const uploadedVideo = await uploadOnCloudinary(videoLocalPath);
     const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
