@@ -90,6 +90,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         throw new ApiError(500, "something went wrong while fetching subscribers list")
     }
 
+    // console.log(subscribers.length)
+
+    subscribers.push({"size" : subscribers.length})
+
     return res.status(200).json(
         new ApiResponse(200, subscribers, "subscriber list fetched successfully")
     )
